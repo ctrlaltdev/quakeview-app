@@ -1,12 +1,49 @@
 import React from 'react'
-import { Platform, StyleSheet, Text, TouchableOpacity, ScrollView, View } from 'react-native'
+import styled from 'styled-components'
 
-const Filters = ({ prefix, items, selected, onChange }) => {
+const Filters = ({ prefix, items, selected, onPress }) => {
     return items.map(item => (
-        <View className='Filters__Filter' key={`${prefix}-${item.value}`}>
-            <TouchableOpacity onChange={onChange}><View value={item.value} checked={selected === item.value}></View> <Text>{ item.label }</Text></TouchableOpacity>
-        </View>
+        <Filter className='Filters__Filter' key={`${prefix}-${item.value}`}>
+            <RadioWrapper onPress={() => onPress(item.value)}><Radio checked={ selected === item.value } /><Label>{ item.label }</Label></RadioWrapper>
+        </Filter>
     ))
 }
 
 export default Filters
+
+const Filter = styled.View`
+    margin-right: 8px;
+`
+const RadioWrapper = styled.TouchableOpacity`
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+`
+
+const Radio = ({ checked }) => (
+    <RadioOuter><RadioInner checked={ checked } /></RadioOuter>
+)
+
+const RadioOuter = styled.View`
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 16px;
+    background-color: #ddd;
+    margin-right: 4px;
+`
+
+const RadioInner = styled.View`
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    margin: 3px auto;
+    background-color: white;
+    ${ props => props.checked ? `
+        background-color: #99ccff;
+    ` : '' }
+`
+
+const Label = styled.Text`
+    flex: 0 0 auto;
+`

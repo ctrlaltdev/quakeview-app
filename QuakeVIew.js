@@ -1,8 +1,8 @@
-import { Platform, StyleSheet, Text, ScrollView, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
+import { View } from 'react-native'
 
 import { getGeolocation } from './utils/getGeolocation'
-import { newNotification } from './utils/notifications'
 import { autoUnit } from './utils/locale'
 
 import { getEarthQuakes, renderQuakes, renderNoQuakes } from './components/Earthquakes'
@@ -14,15 +14,8 @@ const index = () => {
   const [timeframe, updateTimeframe] = useState('day')
   const [threshold, updateThreshold] = useState('4.5')
   const [user, updateUser] = useState({ location: null, unit: 'km', userSelected: false })
-  const [canNotify, updateCanNotify] = useState(false)
-  // const [map, updateMap] = useState({ isOpen: false })
-  
-  let notifications = []
 
   useEffect(() => {
-    updateCanNotify(Notification.permission === 'granted')
-    const deniedNotify = Notification.permission === 'denied'
-
     getGeolocation()
       .then(location => {
         if (!user.userSelected) {
@@ -31,13 +24,6 @@ const index = () => {
           updateUser({ ...user, location: location })
         }
       })
-
-    if (!canNotify && !deniedNotify) {
-      Notification.requestPermission()
-        .then(permission => {
-          updateCanNotify(permission === 'granted')
-        })
-    }
   }, [])
 
   useEffect(() => {
@@ -50,14 +36,11 @@ const index = () => {
       getEarthQuakes(timeframe, threshold)
         .then(quakes => { 
           updateQuakes(quakes.features)
-          if (canNotify) {
-            notifications.push(newNotification('Quake View', 'New earthquakes'))
-          }
         })
     }, 1000 * 60)
 
     return () => clearInterval(interval)
-  }, [timeframe, threshold, canNotify])
+  }, [timeframe, threshold])
 
   const openMap = (coords, quake) => {
     // updateMap({ ...coords, ...quake, isOpen: true })
@@ -67,16 +50,16 @@ const index = () => {
     updateMap({ isOpen: false })
   }
 
-  const changeTimeframe = (e) => {
-    updateTimeframe(e.target.value)
+  const changeTimeframe = (value) => {
+    updateTimeframe(value)
   }
 
-  const changeThreshold = (e) => {
-    updateThreshold(e.target.value)
+  const changeThreshold = (value) => {
+    updateThreshold(value)
   }
 
-  const changeUnit = (e) => {
-    updateUser({ ...user, unit: e.target.value, userSelected: true })
+  const changeUnit = (value) => {
+    updateUser({ ...user, unit: value, userSelected: true })
   }
 
   const timeOptions = [
@@ -98,25 +81,35 @@ const index = () => {
     <View>
       <View className='Filters'>
         <View className='Filters__Timeframe'>
-          <Filters prefix='time' selected={timeframe} onChange={changeTimeframe} items={timeOptions} />
+          <FiltersList><Filters prefix='time' selected={timeframe} onPress={changeTimeframe} items={timeOptions} /></FiltersList>
         </View>
         <View className='Filters__Threshold'>
-          <Filters prefix='magnitude' selected={threshold} onChange={changeThreshold} items={thresholdOptions} />
+          <FiltersList><Filters prefix='magnitude' selected={threshold} onPress={changeThreshold} items={thresholdOptions} /></FiltersList>
         </View>
         <View className='Filters__Unit'>
-          <Filters prefix='unit' selected={user.unit} onChange={changeUnit} items={[{ value: 'km', label: 'Metric' }, { value: 'mi', label: 'Imperial' }]} />
+          <FiltersList><Filters prefix='unit' selected={user.unit} onPress={changeUnit} items={[{ value: 'km', label: 'Metric' }, { value: 'mi', label: 'Imperial' }]} /></FiltersList>
         </View>
       </View>
 
       {/* { map.isOpen ? <MapContainer coords={map.coords} quake={map.quake} closeMap={closeMap} /> : null } */}
 
       { quakes.length > 0 ? 
-        <ul className='Earthquakes'>
+        <Quakes className='Earthquakes'>
           { renderQuakes(quakes, user, openMap) }
-        </ul> : renderNoQuakes()
+        </Quakes> : renderNoQuakes()
       }
     </View>
   )
 }
 
 export default index
+
+const Quakes = styled.ScrollView`
+
+`
+const FiltersList = styled.View`
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  padding: 8px;
+`
