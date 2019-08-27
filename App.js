@@ -1,51 +1,29 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
+import { StatusBar } from 'react-native'
+
 import styled from 'styled-components'
-import { Platform, StatusBar } from 'react-native'
-import { AppLoading } from 'expo'
-import * as Font from 'expo-font'
 
-import QuakeView from './QuakeVIew'
+import colors from './constants/colors'
 
-export default function App(props) {
-  const [isLoadingComplete, setLoadingComplete] = useState(false)
+import QuakeView from './components/QuakeView'
 
-  if (!isLoadingComplete && !props.skipLoadingScreen) {
-    return (
-      <AppLoading
-        startAsync={loadResourcesAsync}
-        onError={handleLoadingError}
-        onFinish={() => handleFinishLoading(setLoadingComplete)}
-      />
-    )
-  } else {
-    return (
+
+const App = () => {
+  return (
+    <Root>
       <Container>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        <StatusBar barStyle="light-content" backgroundColor="#222" />
         <QuakeView />
       </Container>
-    )
-  }
+    </Root>
+  )
 }
 
-async function loadResourcesAsync() {
-  const fontAssets = cacheFonts([{ Montserrat: require('./assets/fonts/montserrat.ttf') }])
-  await Promise.all([
-    ...fontAssets
-  ])
-}
-
-function cacheFonts (fonts) {
-  return fonts.map(font => Font.loadAsync(font))
-}
-
-function handleLoadingError(error) {
-  console.warn(error);
-}
-
-function handleFinishLoading(setLoadingComplete) {
-  setLoadingComplete(true);
-}
-
-const Container = styled.View`
-  padding-top: 32px;
+const Root = styled.View`
+  background-color: ${ colors.background };
+  height: 100%;
 `
+
+const Container = styled.SafeAreaView`
+`
+export default App

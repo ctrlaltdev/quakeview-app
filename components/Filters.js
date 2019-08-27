@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import colors from '../constants/colors'
+
 const Filters = ({ prefix, items, selected, onPress }) => {
     return items.map(item => (
         <Filter className='Filters__Filter' key={`${prefix}-${item.value}`}>
@@ -38,12 +40,13 @@ const RadioInner = styled.View`
     height: 10px;
     border-radius: 10px;
     margin: 3px auto;
-    background-color: white;
+    background-color: ${ colors.background };
     ${ props => props.checked ? `
-        background-color: #99ccff;
+        background-color: ${ colors.accent };
     ` : '' }
 `
 
 const Label = styled.Text`
     flex: 0 0 auto;
+    color: ${ colors.foreground };
 `

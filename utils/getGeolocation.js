@@ -1,6 +1,10 @@
 export const getGeolocation = () => {
   return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(location => { resolve(location) })
+    navigator.geolocation.getCurrentPosition(
+      location => resolve(location),
+      err => reject(err),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    )
   })
 }
 

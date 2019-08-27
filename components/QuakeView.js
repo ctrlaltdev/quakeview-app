@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { View } from 'react-native'
+import { RefreshControl, ActivityIndicator, View } from 'react-native'
 
-import { getGeolocation } from './utils/getGeolocation'
-import { autoUnit } from './utils/locale'
+import { getGeolocation } from '../utils/getGeolocation'
+import { autoUnit } from '../utils/locale'
 
-import { getEarthQuakes, renderQuakes, renderNoQuakes } from './components/Earthquakes'
-import Filters from './components/Filters'
-import MapContainer from './components/MapContainer'
+import { getEarthQuakes, renderQuakes, renderNoQuakes } from './Earthquakes'
+import Filters from './Filters'
+
+import colors from '../constants/colors';
 
 const index = () => {
-  const [quakes, updateQuakes] = useState([])
-  const [timeframe, updateTimeframe] = useState('day')
-  const [threshold, updateThreshold] = useState('4.5')
-  const [user, updateUser] = useState({ location: null, unit: 'km', userSelected: false })
+  const [ loading, setLoading ] = useState(true)
+  const [ quakes, updateQuakes ] = useState([])
+  const [ timeframe, updateTimeframe ] = useState('day')
+  const [ threshold, updateThreshold ] = useState('4.5')
+  const [ user, updateUser ] = useState({ location: null, unit: 'km', userSelected: false })
 
   useEffect(() => {
     getGeolocation()
@@ -24,30 +26,20 @@ const index = () => {
           updateUser({ ...user, location: location })
         }
       })
+      .catch(e => console.log(e))
   }, [])
 
   useEffect(() => {
+    refreshQuakes()
+  }, [timeframe, threshold])
+
+  const refreshQuakes = () => {
+    setLoading(true)
     getEarthQuakes(timeframe, threshold)
-      .then(quakes => { updateQuakes(quakes.features) })
-  }, [timeframe, threshold])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getEarthQuakes(timeframe, threshold)
-        .then(quakes => { 
-          updateQuakes(quakes.features)
-        })
-    }, 1000 * 60)
-
-    return () => clearInterval(interval)
-  }, [timeframe, threshold])
-
-  const openMap = (coords, quake) => {
-    // updateMap({ ...coords, ...quake, isOpen: true })
-  }
-
-  const closeMap = () => {
-    updateMap({ isOpen: false })
+      .then(quakes => {
+        updateQuakes(quakes.features)
+        setLoading(false)
+      })
   }
 
   const changeTimeframe = (value) => {
@@ -91,12 +83,13 @@ const index = () => {
         </View>
       </View>
 
-      {/* { map.isOpen ? <MapContainer coords={map.coords} quake={map.quake} closeMap={closeMap} /> : null } */}
-
-      { quakes.length > 0 ? 
-        <Quakes className='Earthquakes'>
-          { renderQuakes(quakes, user, openMap) }
-        </Quakes> : renderNoQuakes()
+      { loading ? <ActivityIndicator size="large" color={ colors.accent } /> : 
+        quakes.length > 0 ? 
+          <Quakes refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={refreshQuakes} />
+          }>
+            { renderQuakes(quakes, user) }
+          </Quakes> : renderNoQuakes()
       }
     </View>
   )
@@ -105,7 +98,7 @@ const index = () => {
 export default index
 
 const Quakes = styled.ScrollView`
-
+  height: 100%;
 `
 const FiltersList = styled.View`
   display: flex;

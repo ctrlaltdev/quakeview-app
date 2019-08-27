@@ -1,6 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 import Moment from 'moment'
+
+import colors from '../constants/colors'
+
 import { magnitudeColoring } from '../utils/magnitudeColoring'
 import { getDistance } from '../utils/getGeolocation'
 
@@ -10,10 +13,10 @@ export const getEarthQuakes = (timeframe = 'hour', threshold = 'all') => {
   })
 }
 
-export const renderQuakes = (quakes = [], user = {}, openMap = null) => {
+export const renderQuakes = (quakes = [], user = {}) => {
   return quakes.map((q, i) => (
-    <Quake className='Earthquake' key={`quake-${q.id}`} onClick={() => { openMap({ lat: q.geometry.coordinates[1], lon: q.geometry.coordinates[0] }, q.properties.mag) }}>
-      <Magnitude className='Earthquake__Magnitude' style={{ backgroundColor: magnitudeColoring(q.properties.mag) }}><MagnitudeOverlay className='Earthquake__Magnitude__Overlay'>{ q.properties.mag }</MagnitudeOverlay></Magnitude>
+    <Quake className='Earthquake' key={`quake-${q.id}`}>
+      <Magnitude className='Earthquake__Magnitude' style={{ backgroundColor: magnitudeColoring(q.properties.mag) }}><MagnitudeOverlay className='Earthquake__Magnitude__Overlay'><MagnitudeText>{ q.properties.mag }</MagnitudeText></MagnitudeOverlay></Magnitude>
       <Location className='Earthquake__Location'>
         { q.properties.place }
         { user.location ?
@@ -36,10 +39,14 @@ export const renderNoQuakes = () => {
 
 const NoQuakes = styled.View`
   padding: 16px;
+  height: 100%;
 `
 const NoQuakesText = styled.Text`
   font-family: 'Montserrat';
   font-size: 32px;
+  margin-top: 50%;
+  text-align: center;
+  color: ${ colors.foreground };
 `
 
 const Quake = styled.View`
@@ -48,6 +55,7 @@ const Quake = styled.View`
   font-size: 16px;
   display: flex;
   flex-flow: row nowrap;
+  background-color: rgba(255, 255, 255, 0.1);
 `
 
 const Magnitude = styled.View`
@@ -59,15 +67,19 @@ const Magnitude = styled.View`
   background-color: grey;
 `
 
-const MagnitudeOverlay = styled.Text`
-  font-family: 'Montserrat';
+const MagnitudeOverlay = styled.View`
+  background-color: rgba(0, 0, 0, 0.2);
   width: 48px;
   height: 48px;
+`
+
+const MagnitudeText = styled.Text`
   line-height: 48px;
-  background-color: rgba(0, 0, 0, 0.2);
   font-weight: bold;
   color: white;
   text-align: center;
+  color: ${ colors.background };
+  font-family: 'Montserrat';
 `
 
 const Location = styled.Text`
@@ -75,6 +87,7 @@ const Location = styled.Text`
   flex: 1 1 auto;
   padding: 0 8px;
   height: 48px;
+  color: ${ colors.foreground };
 `
 
 const Time = styled.View`
@@ -87,9 +100,11 @@ const TimeAbsolute = styled.Text`
   font-family: 'Montserrat';
   height: 48px;
   display: none;
+  color: ${ colors.foreground };
 `
 
 const TimeRelative = styled.Text`
   font-family: 'Montserrat';
   height: 48px;
+  color: ${ colors.foreground };
 `
