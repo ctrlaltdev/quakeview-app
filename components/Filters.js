@@ -1,10 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import colors from '../constants/colors'
+
 const Filters = ({ prefix, items, selected, onPress }) => {
     return items.map(item => (
-        <Filter className='Filters__Filter' key={`${prefix}-${item.value}`}>
-            <RadioWrapper onPress={() => onPress(item.value)}><Radio checked={ selected === item.value } /><Label>{ item.label }</Label></RadioWrapper>
+        <Filter key={`${prefix}-${item.value}`} checked={ selected === item.value }>
+            <RadioWrapper onPress={() => onPress(item.value)}><Radio checked={ selected === item.value }><Label checked={ selected === item.value }>{ item.label }</Label></Radio></RadioWrapper>
         </Filter>
     ))
 }
@@ -12,38 +14,28 @@ const Filters = ({ prefix, items, selected, onPress }) => {
 export default Filters
 
 const Filter = styled.View`
-    margin-right: 8px;
+    flex: 1 1 auto;
+    border-bottom-width: 1px;
+    border-bottom-color: grey;
+    ${ props => props.checked ? `
+        border-bottom-color: ${ colors.accent };
+    ` : '' }
 `
 const RadioWrapper = styled.TouchableOpacity`
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
 `
 
-const Radio = ({ checked }) => (
-    <RadioOuter><RadioInner checked={ checked } /></RadioOuter>
-)
-
-const RadioOuter = styled.View`
-    flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
-    border-radius: 16px;
-    background-color: #ddd;
-    margin-right: 4px;
-`
-
-const RadioInner = styled.View`
-    width: 10px;
-    height: 10px;
-    border-radius: 10px;
-    margin: 3px auto;
-    background-color: white;
+const Radio = styled.View`
+    padding: 4px 8px;
+    background-color: rgba(255, 255, 255, 0);
     ${ props => props.checked ? `
-        background-color: #99ccff;
+        background-color: rgba(255, 255, 255, 0.1);
     ` : '' }
 `
 
 const Label = styled.Text`
-    flex: 0 0 auto;
+    text-align: center;
+    color: ${ colors.foreground };
+    ${ props => props.checked ? `
+        color: ${ colors.accent };
+    ` : '' }
 `

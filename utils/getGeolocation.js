@@ -1,7 +1,50 @@
-export const getGeolocation = () => {
-  return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(location => { resolve(location) })
-  })
+import Locator from 'react-native-geolocation-service'
+import { Platform, PermissionsAndroid } from 'react-native'
+
+async function requestLocationPermission () {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Where are you?',
+        message:
+          'We can tell you the distance to the earthquake ' +
+          'if you give us permission.',
+        buttonNeutral: 'Meh',
+        buttonNegative: 'Nope',
+        buttonPositive: 'OK',
+      },
+    )
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      return true
+    } else {
+      return false
+    }
+  } catch (err) {
+    console.warn(err)
+  }
+}
+
+export class Geolocation {
+  constructor () {
+    if ( Platform.OS === 'ios' ) {
+      Locator.setRNConfiguration({ authorizationLevel: 'whenInUse' })
+      this.granted = Locator.requestAuthorization()
+    }
+    if ( Platform.OS === 'android' ) {
+      this.granted = requestLocationPermission()
+    }
+  }
+
+  getLocation() {
+    return new Promise((resolve, reject) => {
+      Locator.getCurrentPosition(
+        location => resolve(location),
+        err => reject(err),
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+      ).catch(err => reject(err))
+    })
+  }
 }
 
 export const getDistance = (coord1, coord2) => {
