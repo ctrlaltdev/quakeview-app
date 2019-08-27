@@ -6,16 +6,16 @@ import { getGeolocation } from '../utils/getGeolocation'
 import { autoUnit } from '../utils/locale'
 
 import { getEarthQuakes, renderQuakes, renderNoQuakes } from './Earthquakes'
-import Filters from './Filters'
+import FilterPanel from './FilterPanel'
 
 import colors from '../constants/colors';
 
-const index = () => {
+const QuakeView = () => {
   const [ loading, setLoading ] = useState(true)
   const [ quakes, updateQuakes ] = useState([])
   const [ timeframe, updateTimeframe ] = useState('day')
   const [ threshold, updateThreshold ] = useState('4.5')
-  const [ user, updateUser ] = useState({ location: null, unit: 'km', userSelected: false })
+  const [ user, updateUser ] = useState({ location: null, unit: 'mi', userSelected: false })
 
   useEffect(() => {
     getGeolocation()
@@ -69,40 +69,53 @@ const index = () => {
     { value: 'significant', label: 'Significants' }
   ]
 
-  return (
-    <View>
-      <View className='Filters'>
-        <View className='Filters__Timeframe'>
-          <FiltersList><Filters prefix='time' selected={timeframe} onPress={changeTimeframe} items={timeOptions} /></FiltersList>
-        </View>
-        <View className='Filters__Threshold'>
-          <FiltersList><Filters prefix='magnitude' selected={threshold} onPress={changeThreshold} items={thresholdOptions} /></FiltersList>
-        </View>
-        <View className='Filters__Unit'>
-          <FiltersList><Filters prefix='unit' selected={user.unit} onPress={changeUnit} items={[{ value: 'km', label: 'Metric' }, { value: 'mi', label: 'Imperial' }]} /></FiltersList>
-        </View>
-      </View>
+  const filterlist = [
+    {
+      prefix: 'Timeframe',
+      selected: timeframe,
+      items: timeOptions,
+      onPress: changeTimeframe
+    },
+    {
+      prefix: 'Magnitude',
+      selected: threshold,
+      items: thresholdOptions,
+      onPress: changeThreshold
+    },
+    {
+      prefix: 'Unit',
+      selected: user.unit,
+      items: [{ value: 'km', label: 'Metric' }, { value: 'mi', label: 'Imperial' }],
+      onPress: changeUnit
+    }
+  ]
 
-      { loading ? <ActivityIndicator size="large" color={ colors.accent } /> : 
-        quakes.length > 0 ? 
-          <Quakes refreshControl={
-            <RefreshControl refreshing={loading} onRefresh={refreshQuakes} />
-          }>
-            { renderQuakes(quakes, user) }
-          </Quakes> : renderNoQuakes()
-      }
-    </View>
+  return (
+    <Main>
+      <Top>
+        <FilterPanel filterlist={ filterlist } />
+      </Top>
+      <Content>
+        { loading ? <ActivityIndicator size="large" color={ colors.accent } /> : 
+          quakes.length > 0 ? renderQuakes(quakes, user, loading, refreshQuakes) : renderNoQuakes()
+        }
+      </Content>
+    </Main>
   )
 }
 
-export default index
+export default QuakeView
 
-const Quakes = styled.ScrollView`
+const Main = styled.View`
+  display: flex;
+  flex-flow: column nowrap;
   height: 100%;
 `
-const FiltersList = styled.View`
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-between;
-  padding: 8px;
+
+const Top = styled.View`
+  flex: 1 0 auto;
+`
+
+const Content = styled.View`
+  flex: 1 1 auto;
 `
