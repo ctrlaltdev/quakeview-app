@@ -20,5 +20,7 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We can tell you the distance to the earthquake if you give us permission.</string>
 </dict>
 </plist>

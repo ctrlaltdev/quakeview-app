@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { RefreshControl, ActivityIndicator, View } from 'react-native'
+import { ActivityIndicator } from 'react-native'
 
 import { Geolocation } from '../utils/getGeolocation'
-const GPS = new Geolocation()
 import { autoUnit } from '../utils/locale'
 
 import { getEarthQuakes, renderQuakes, renderNoQuakes } from './Earthquakes'
@@ -12,6 +11,8 @@ import FilterPanel from './FilterPanel'
 import colors from '../constants/colors';
 
 const QuakeView = () => {
+  const GPS = new Geolocation()
+
   const [ loading, setLoading ] = useState(true)
   const [ quakes, updateQuakes ] = useState([])
   const [ timeframe, updateTimeframe ] = useState('day')
@@ -19,7 +20,7 @@ const QuakeView = () => {
   const [ user, updateUser ] = useState({ location: null, unit: 'mi', userSelected: false })
 
   useEffect(() => {
-    GPS.location
+    GPS.getLocation()
       .then(location => {
         if (!user.userSelected) {
           updateUser({ ...user, location: location, unit: autoUnit() })
@@ -114,9 +115,9 @@ const Main = styled.View`
 `
 
 const Top = styled.View`
-  flex: 1 0 auto;
+  flex: 0 0 auto;
 `
 
 const Content = styled.View`
-  flex: 1 1 auto;
+  flex: 0 1 auto;
 `

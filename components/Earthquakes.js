@@ -23,13 +23,13 @@ export const renderQuakes = (quakes = [], user = {}, loading, refreshQuakes) => 
         <Location>
           { q.properties.place }
           { user.location ?
-            ` - ${ getDistance({ lat: user.location.coords.latitude, lon: user.location.coords.longitude }, { lat: q.geometry.coordinates[1], lon: q.geometry.coordinates[0] })[user.unit].toLocaleString() }${user.unit} from you` :
+            ` - ${ getDistance({ lat: user.location.coords.latitude, lon: user.location.coords.longitude }, { lat: q.geometry.coordinates[1], lon: q.geometry.coordinates[0] })[user.unit].toLocaleString() } ${user.unit} from you` :
             null
           }
         </Location>
       </LocationWrapper>
       <TimeWrapper>
-        <Time>{ Moment(q.properties.time).fromNow() }</Time>
+        <Time>{ Moment(q.properties.time).fromNow(true) }</Time>
       </TimeWrapper>
     </Quake>
   )

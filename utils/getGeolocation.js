@@ -28,6 +28,7 @@ async function requestLocationPermission () {
 export class Geolocation {
   constructor () {
     if ( Platform.OS === 'ios' ) {
+      Locator.setRNConfiguration({ authorizationLevel: 'whenInUse' })
       this.granted = Locator.requestAuthorization()
     }
     if ( Platform.OS === 'android' ) {
@@ -35,16 +36,14 @@ export class Geolocation {
     }
   }
 
-  get location() {
-    if ( this.granted ) {
-      return new Promise((resolve, reject) => {
-        Locator.getCurrentPosition(
-          location => resolve(location),
-          err => reject(err),
-          { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-        ).catch(err => reject(err))
-      })
-    }
+  getLocation() {
+    return new Promise((resolve, reject) => {
+      Locator.getCurrentPosition(
+        location => resolve(location),
+        err => reject(err),
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+      ).catch(err => reject(err))
+    })
   }
 }
 
