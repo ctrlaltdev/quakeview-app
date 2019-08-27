@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { RefreshControl, ActivityIndicator, View } from 'react-native'
 
-import { getGeolocation } from '../utils/getGeolocation'
+import { Geolocation } from '../utils/getGeolocation'
+const GPS = new Geolocation()
 import { autoUnit } from '../utils/locale'
 
 import { getEarthQuakes, renderQuakes, renderNoQuakes } from './Earthquakes'
@@ -18,7 +19,7 @@ const QuakeView = () => {
   const [ user, updateUser ] = useState({ location: null, unit: 'mi', userSelected: false })
 
   useEffect(() => {
-    getGeolocation()
+    GPS.location
       .then(location => {
         if (!user.userSelected) {
           updateUser({ ...user, location: location, unit: autoUnit() })
